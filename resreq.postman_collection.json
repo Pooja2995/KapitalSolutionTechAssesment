@@ -1,0 +1,372 @@
+{
+	"info": {
+		"_postman_id": "8bb353a3-b278-4301-b758-b7c8f022be9d",
+		"name": "resreq",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34989141",
+		"_collection_link": "https://restless-comet-811120.postman.co/workspace/New-Team-Workspace~4d351fff-a642-4688-8a55-e0d58a78e435/collection/34989141-8bb353a3-b278-4301-b758-b7c8f022be9d?action=share&source=collection_link&creator=34989141"
+	},
+	"item": [
+		{
+			"name": "New Folder",
+			"item": []
+		},
+		{
+			"name": "User Register- valid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains id and token\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"id\");\r",
+							"    pm.expect(jsonData).to.have.property(\"token\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"{{email}}\",\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{$randomPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/register",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Register- invalid data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400); // Adjust if the actual error status code is different\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains error message\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"error\", \"Note: Only defined users succeed registration\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"{{invalidemail}}\",\r\n  \"email\": \"{{invalidemail}}\",\r\n  \"password\": \"{{$randomPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/register",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if the response status code is 200 (OK)",
+							"if (pm.response.code === 200) {",
+							"    // Parse the response JSON",
+							"    let responseBody = pm.response.json();",
+							"",
+							"    // Initialize variables to store data",
+							"    let id, email, first_name, last_name, avatar;",
+							"",
+							"    // Search for id=3 in the response data array",
+							"    let user = responseBody.data.find(user => user.id === 5);",
+							"",
+							"    // If user with id=3 is found, store the values",
+							"    if (user) {",
+							"        id = user.id;",
+							"        email = user.email;",
+							"        first_name = user.first_name;",
+							"        last_name = user.last_name;",
+							"        avatar = user.avatar;",
+							"    }",
+							"",
+							"    // Set environment variables with the stored values",
+							"    pm.environment.set(\"id\", id);",
+							"    pm.environment.set(\"email\", email);",
+							"    pm.environment.set(\"first_name\", first_name);",
+							"    pm.environment.set(\"last_name\", last_name);",
+							"    pm.environment.set(\"avatar\", avatar);",
+							"} else {",
+							"    console.log(\"Request failed with status code: \" + pm.response.code);",
+							"}",
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate the response schema for the presence of page, per_page, total, total_pages, data, and support fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.page).to.exist;",
+							"    pm.expect(responseData.per_page).to.exist;",
+							"    pm.expect(responseData.total).to.exist;",
+							"    pm.expect(responseData.total_pages).to.exist;",
+							"    pm.expect(responseData.data).to.exist;",
+							"    pm.expect(responseData.support).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Data array is present and contains expected number of elements\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.data).to.be.an('array');",
+							"    pm.expect(responseData.data.length).to.equal(6); // Assuming the expected number of elements is 1",
+							"});",
+							"",
+							"",
+							"pm.test(\"Id is a non-negative integer\", function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.data.forEach(function(user) {",
+							"        pm.expect(user.id).to.be.a('number').and.to.be.at.least(0, \"Id should be a non-negative integer\");",
+							"    });",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/users",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse the response JSON\r",
+							"let responseData = pm.response.json();\r",
+							"\r",
+							"// Extract data from the response\r",
+							"let userData = responseData.data;\r",
+							"let id = userData.id;\r",
+							"let email = userData.email;\r",
+							"let firstName = userData.first_name;\r",
+							"let lastName = userData.last_name;\r",
+							"let avatar = userData.avatar;\r",
+							"\r",
+							"// Set environment variables with the extracted data\r",
+							"pm.environment.set(\"id\", id);\r",
+							"pm.environment.set(\"email\", email);\r",
+							"pm.environment.set(\"firstName\", firstName);\r",
+							"pm.environment.set(\"lastName\", lastName);\r",
+							"pm.environment.set(\"avatar\", avatar);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/users/{{id}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"users",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User with ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Check if the response status code is 200 (OK)",
+							"if (pm.response.code === 200) {",
+							"    // Parse the response JSON",
+							"    let responseBody = pm.response.json();",
+							"",
+							"    // Extract data from the response",
+							"    let id = responseBody.id;",
+							"    let email = responseBody.email;",
+							"    let first_name = responseBody.first_name;",
+							"    let last_name = responseBody.last_name;",
+							"    let avatar = responseBody.avatar;",
+							"",
+							"    // Check if the response data matches the data sent in the request",
+							"    if (",
+							"        id === pm.environment.get(\"id\") &&",
+							"        email === pm.variables.get(\"randomEmail\") &&",
+							"        first_name === pm.environment.get(\"first_name\") &&",
+							"        last_name === pm.environment.get(\"last_name\") &&",
+							"        avatar === pm.environment.get(\"avatar\")",
+							"    ) {",
+							"        console.log(\"Request sent was updated successfully.\");",
+							"    } else {",
+							"        console.log(\"Request sent was not updated.\");",
+							"    }",
+							"} else {",
+							"    console.log(\"Request failed with status code: \" + pm.response.code);",
+							"}",
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"  pm.expect(pm.response.responseTime).to.be.below(330);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('id');",
+							"    pm.expect(responseData).to.have.property('email');",
+							"    pm.expect(responseData).to.have.property('first_name');",
+							"    pm.expect(responseData).to.have.property('last_name');",
+							"    pm.expect(responseData).to.have.property('avatar');",
+							"    pm.expect(responseData).to.have.property('updatedAt');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Email is in a valid format\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData.email).to.match(/\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b/i);",
+							"});",
+							"",
+							"",
+							"pm.test(\"UpdatedAt field is in a valid date format\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.have.property('updatedAt').that.is.a('string');",
+							"  pm.expect(() => new Date(responseData.updatedAt)).to.not.throw();",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": " {\r\n            \"id\": {{id}},\r\n            \"email\": \"{{$randomEmail}}\",\r\n            \"first_name\": \"{{first_name}}\",\r\n            \"last_name\": \"{{last_name}}\",\r\n            \"avatar\": \"{{avatar}}\"\r\n        }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/users/5",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"users",
+						"5"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
